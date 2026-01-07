@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Naruto Gold — Minha Coleção</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #121212;
+      color: #eee;
+    }
+
+    header {
+      background: #e2b007;
+      color: #111;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    #cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .card {
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    .card h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+    }
+
+    .card input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: #e2b007;
+    }
+
+    .card label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .tenho {
+      border: 2px solid #2ecc71;
+    }
+
+    .faltando {
+      border: 2px solid #e74c3c;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 400px) {
+      header {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>Naruto Gold — Minha Coleção</header>
+
+<div id="cards"></div>
+
+<script>
+  const sheetId = "19ezLkVYItTEMmK27XQcpZ5FNCa2EjYbZImb6Fsz3yt0";
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+  fetch(url)
+    .then(res => res.text())
+    .then(text => {
+      const jsonText = text.match(
+        /google\.visualization\.Query\.setResponse\((.*)\);/s
+      )[1];
+
+      const json = JSON.parse(jsonText);
+      const rows = json.table.rows;
+      const container = document.getElementById("cards");
+
+      rows.forEach(r => {
+        const volume = r.c[0]?.v;
+        const tenho = r.c[1]?.v === true;
+
+        const card = document.createElement("div");
+        card.className = `card ${tenho ? "tenho" : "faltando"}`;
+
+        card.innerHTML = `
+          <h2>Vol. ${volume}</h2>
+          <input type="checkbox" ${tenho ? "checked" : ""} disabled>
+          <label>${tenho ? "Tenho" : "Faltando"}</label>
+        `;
+
+        container.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error("Erro ao carregar a planilha:", err);
+    });
+</script>
+
+</body>
+</html>
