@@ -81,6 +81,9 @@
   const sheetId = "19ezLkVYItTEMmK27XQcpZ5FNCa2EjYbZImb6Fsz3yt0";
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
+  const container = document.getElementById("cards");
+  const contador = document.getElementById("contador");
+
   fetch(url)
     .then(res => res.text())
     .then(text => {
@@ -92,25 +95,24 @@
       const json = JSON.parse(jsonText);
       const rows = json.table.rows;
 
-      const container = document.getElementById("cards");
-      const contador = document.getElementById("contador");
-
-      // 🔹 Pega valor da célula D2 (linha 2, coluna D)
-      // Linha 2 = índice 1
-      // Coluna D = índice 3
-      const faltam = rows[1]?.c[3]?.v ?? 0;
-
-      contador.textContent = `Faltam ${faltam} volumes`;
+      let total = 0;
+      let faltando = 0;
 
       rows.forEach((r, index) => {
 
-        // Ignora linha 1 (header)
+        // Ignora header
         if (index === 0) return;
 
         const volume = r.c[0]?.v;
         const tenho = r.c[1]?.v === true;
 
-        if (!volume) return;
+        if (volume === null || volume === undefined) return;
+
+        total++;
+
+        if (!tenho) {
+          faltando++;
+        }
 
         const card = document.createElement("div");
         card.className = `card ${tenho ? "tenho" : "faltando"}`;
@@ -123,9 +125,12 @@
         container.appendChild(card);
       });
 
+      contador.textContent = `Faltam ${faltando} volumes (${total - faltando}/${total} completos)`;
+
     })
     .catch(err => {
       console.error("Erro ao carregar planilha:", err);
+      contador.textContent = "Erro ao carregar dados.";
     });
 </script>
 
