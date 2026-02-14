@@ -17,10 +17,19 @@
     header {
       background: #e2b007;
       color: #111;
-      padding: 15px;
+      padding: 20px 10px;
       text-align: center;
-      font-size: 1.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    header p {
+      margin: 6px 0 0 0;
       font-weight: bold;
+      font-size: 1rem;
     }
 
     #cards {
@@ -49,12 +58,6 @@
       accent-color: #e2b007;
     }
 
-    .card label {
-      display: block;
-      margin-top: 6px;
-      font-size: 0.9rem;
-    }
-
     .tenho {
       border: 2px solid #2ecc71;
     }
@@ -63,17 +66,14 @@
       border: 2px solid #e74c3c;
       opacity: 0.85;
     }
-
-    @media (max-width: 400px) {
-      header {
-        font-size: 1.3rem;
-      }
-    }
   </style>
 </head>
 <body>
 
-<header>Naruto Gold — Minha Coleção</header>
+<header>
+  <h1>Naruto Gold — Minha Coleção</h1>
+  <p id="contador">Carregando...</p>
+</header>
 
 <div id="cards"></div>
 
@@ -84,17 +84,33 @@
   fetch(url)
     .then(res => res.text())
     .then(text => {
+
       const jsonText = text.match(
         /google\.visualization\.Query\.setResponse\((.*)\);/s
       )[1];
 
       const json = JSON.parse(jsonText);
       const rows = json.table.rows;
-      const container = document.getElementById("cards");
 
-      rows.forEach(r => {
+      const container = document.getElementById("cards");
+      const contador = document.getElementById("contador");
+
+      // 🔹 Pega valor da célula D2 (linha 2, coluna D)
+      // Linha 2 = índice 1
+      // Coluna D = índice 3
+      const faltam = rows[1]?.c[3]?.v ?? 0;
+
+      contador.textContent = `Faltam ${faltam} volumes`;
+
+      rows.forEach((r, index) => {
+
+        // Ignora linha 1 (header)
+        if (index === 0) return;
+
         const volume = r.c[0]?.v;
         const tenho = r.c[1]?.v === true;
+
+        if (!volume) return;
 
         const card = document.createElement("div");
         card.className = `card ${tenho ? "tenho" : "faltando"}`;
@@ -102,14 +118,14 @@
         card.innerHTML = `
           <h2>Vol. ${volume}</h2>
           <input type="checkbox" ${tenho ? "checked" : ""} disabled>
-          <label>${tenho ? "Tenho" : "Faltando"}</label>
         `;
 
         container.appendChild(card);
       });
+
     })
     .catch(err => {
-      console.error("Erro ao carregar a planilha:", err);
+      console.error("Erro ao carregar planilha:", err);
     });
 </script>
 
