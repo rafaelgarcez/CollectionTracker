@@ -95,20 +95,16 @@
       const json = JSON.parse(jsonText);
       const rows = json.table.rows;
 
-      let total = 0;
       let faltando = 0;
 
       rows.forEach((r, index) => {
 
-        // Ignora header
-        if (index === 0) return;
+        if (index === 0) return; // ignora header
 
         const volume = r.c[0]?.v;
         const tenho = r.c[1]?.v === true;
 
         if (volume === null || volume === undefined) return;
-
-        total++;
 
         if (!tenho) {
           faltando++;
@@ -125,7 +121,7 @@
         container.appendChild(card);
       });
 
-      contador.textContent = `Faltam ${faltando} volumes (${total - faltando}/${total} completos)`;
+      contador.textContent = `Faltam ${faltando} volumes`;
 
     })
     .catch(err => {
