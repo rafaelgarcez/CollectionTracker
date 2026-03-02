@@ -1,9 +1,16 @@
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+
   const sheetId = "19ezLkVYItTEMmK27XQcpZ5FNCa2EjYbZImb6Fsz3yt0";
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
   const container = document.getElementById("cards");
   const contador = document.getElementById("contador");
+
+  if (!container) {
+    console.error("Elemento #cards não encontrado no HTML.");
+    return;
+  }
 
   fetch(url)
     .then(res => res.text())
@@ -23,12 +30,9 @@
         const volume = r.c[0]?.v;
         const tenho = r.c[1]?.v === true;
 
-        // ignora linhas realmente vazias
-        if (volume === null || volume === undefined || volume === "") return;
+        if (!volume) return;
 
-        if (!tenho) {
-          faltando++;
-        }
+        if (!tenho) faltando++;
 
         const card = document.createElement("div");
         card.className = `card ${tenho ? "tenho" : "faltando"}`;
@@ -48,4 +52,6 @@
       console.error("Erro ao carregar planilha:", err);
       contador.textContent = "Erro ao carregar dados.";
     });
+
+});
 </script>
